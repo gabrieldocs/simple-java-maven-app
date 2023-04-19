@@ -10,14 +10,13 @@ name: Receive
 
 # read-only repo token
 # no access to secrets
-on:
-  pull_request:
+on: ['push']
 
 jobs:
   store-pitest-feedback:
     # Only run on forked repos. This example project also configures a single stage flow for
     # use when the PR comes from the same repo 
-    if: github.event.pull_request.head.repo.full_name != github.repository
+    # if: github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
 
     steps:
