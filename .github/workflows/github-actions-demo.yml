@@ -5,7 +5,7 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
@@ -13,6 +13,22 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: maven
-      - name: Build with Maven
-        run: mvn --batch-mode --update-snapshots package
+      
+      - uses: actions/cache@v2
+        with:
+          path: /.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
+      - name: Executa o Pitest no projeto
+        run: mvn test-compile org.pitest:pitest-maven:mutationCoverage
+
+      - name: Deploy no Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/pit-reports/*/
+      #  - name: Build with Maven
+      #   run: mvn --batch-mode --update-snapshots package
+
+      
